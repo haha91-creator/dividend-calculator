@@ -8,15 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #f5f7fa; --surface: #ffffff; --surface2: #f0f3f8; --border: #e2e8f0;
-      --text: #1a202c; --text2: #64748b; --text3: #94a3b8;
-      --green: #0d9488; --green-light: #f0fdfa;
-      --blue: #2563eb; --blue-light: #eff6ff;
-      --red: #dc2626; --red-light: #fef2f2;
-      --amber: #d97706; --amber-light: #fffbeb;
-      --radius: 12px; --radius-sm: 8px;
-    }
+    :root { --bg: #f5f7fa; --surface: #ffffff; --surface2: #f0f3f8; --border: #e2e8f0; --text: #1a202c; --text2: #64748b; --text3: #94a3b8; --green: #0d9488; --green-light: #f0fdfa; --blue: #2563eb; --blue-light: #eff6ff; --red: #dc2626; --red-light: #fef2f2; --amber: #d97706; --amber-light: #fffbeb; --radius: 12px; --radius-sm: 8px; }
     body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
     header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
     .header-top { max-width: 980px; margin: 0 auto; padding: 1rem 1.5rem; }
@@ -29,12 +21,10 @@
     .nav-item:hover { color: var(--text); background: var(--surface2); }
     .nav-item.active { color: var(--green); border-bottom-color: var(--green); }
     .nav-badge { font-size: 10px; background: var(--surface2); color: var(--text3); padding: 1px 6px; border-radius: 10px; }
-
     main { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
     .hero { text-align: center; margin-bottom: 2rem; }
     .hero h1 { font-size: 28px; font-weight: 600; margin-bottom: 0.5rem; }
     .hero p { color: var(--text2); }
-
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
     .section-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -43,27 +33,15 @@
     .field label { font-size: 13px; color: var(--text2); font-weight: 500; }
     input[type="number"], select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
     input[type="number"]:focus, select:focus { border-color: var(--green); }
-
     .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     .quick-btn { padding: 6px 12px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--surface); font-family: inherit; font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.15s; }
     .quick-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
-
     .method-group { display: flex; gap: 8px; }
     .method-btn { flex: 1; padding: 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; text-align: center; }
     .method-btn.active { border-color: var(--green); background: var(--green-light); color: var(--green); }
     .method-btn small { display: block; font-size: 11px; font-weight: 400; margin-top: 2px; opacity: 0.8; }
-
     .calc-btn { width: 100%; padding: 14px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 1.25rem; transition: opacity 0.15s; }
     .calc-btn:hover { opacity: 0.9; }
-
-    .result-hero { border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .result-hero-box { border-radius: var(--radius-sm); padding: 1.25rem; text-align: center; }
-    .result-hero-box.green { background: var(--green); color: white; }
-    .result-hero-box.blue  { background: var(--blue);  color: white; }
-    .result-hero-label { font-size: 13px; opacity: 0.85; margin-bottom: 6px; }
-    .result-hero-value { font-size: 26px; font-weight: 700; }
-    .result-hero-sub { font-size: 12px; opacity: 0.75; margin-top: 4px; }
-
     .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
     @media (max-width: 520px) { .metrics { grid-template-columns: 1fr 1fr; } }
     .metric { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
@@ -75,18 +53,11 @@
     .metric.red   .metric-value { color: var(--red); }
     .metric.amber .metric-value { color: var(--amber); }
     .metric.blue  .metric-value { color: var(--blue); }
-
     .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
     .bar-label { font-size: 13px; color: var(--text2); width: 80px; flex-shrink: 0; }
     .bar-track { flex: 1; height: 10px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 5px; transition: width 0.4s ease; }
     .bar-val { font-size: 13px; font-weight: 600; min-width: 90px; text-align: right; }
-
-    .compare-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 10px; }
-    .compare-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-    .compare-title.green { color: var(--green); }
-    .compare-title.blue  { color: var(--blue); }
-
     .schedule-wrap { overflow-x: auto; }
     .schedule-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .schedule-table th { padding: 8px 10px; background: var(--surface2); font-weight: 600; color: var(--text2); text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -95,15 +66,25 @@
     .schedule-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
     .schedule-table tr:last-child td { border-bottom: none; font-weight: 600; background: var(--surface2); color: var(--text); }
     .schedule-toggle { font-size: 13px; color: var(--green); cursor: pointer; margin-top: 10px; display: inline-block; }
-
     .info-box { background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: #1e40af; margin-top: 1rem; }
+    .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-top: 2rem; }
+    .guide h2 { font-size: 20px; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+    .guide h3 { font-size: 16px; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--green); }
+    .guide p { color: var(--text2); font-size: 14px; line-height: 1.8; margin-bottom: 0.75rem; }
+    .guide ul { color: var(--text2); font-size: 14px; line-height: 1.8; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .guide li { margin-bottom: 0.3rem; }
+    .guide-box { background: var(--green-light); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+    .guide-box p { color: var(--text); margin: 0; font-size: 14px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 600; font-size: 14px; margin-bottom: 0.5rem; }
+    .faq-a { font-size: 14px; color: var(--text2); line-height: 1.8; }
     .hidden { display: none; }
     footer { text-align: center; padding: 2rem; color: var(--text3); font-size: 12px; border-top: 1px solid var(--border); margin-top: 2rem; }
     footer a { color: var(--green); text-decoration: none; }
   </style>
 </head>
 <body>
-
 <header>
   <div class="header-top">
     <a class="logo" href="/">계산기<span>모음</span></a>
@@ -118,24 +99,22 @@
     </div>
   </nav>
 </header>
-
 <main>
   <div class="hero">
     <h1>대출이자 계산기</h1>
     <p>원리금균등 · 원금균등 상환방식별 월 납입금과 총 이자를 계산하세요</p>
   </div>
-
   <div class="card">
     <div class="section-label">대출 정보 입력</div>
     <div class="field" style="margin-bottom:16px;">
       <label>대출 금액</label>
       <input type="number" id="principal" value="300000000" min="0" step="10000000" />
       <div class="quick-btns">
-        <button class="quick-btn" onclick="setVal('principal', 50000000)">5천만</button>
-        <button class="quick-btn" onclick="setVal('principal', 100000000)">1억</button>
-        <button class="quick-btn" onclick="setVal('principal', 200000000)">2억</button>
-        <button class="quick-btn" onclick="setVal('principal', 300000000)">3억</button>
-        <button class="quick-btn" onclick="setVal('principal', 500000000)">5억</button>
+        <button class="quick-btn" onclick="setVal('principal',50000000)">5천만</button>
+        <button class="quick-btn" onclick="setVal('principal',100000000)">1억</button>
+        <button class="quick-btn" onclick="setVal('principal',200000000)">2억</button>
+        <button class="quick-btn" onclick="setVal('principal',300000000)">3억</button>
+        <button class="quick-btn" onclick="setVal('principal',500000000)">5억</button>
       </div>
     </div>
     <div class="grid2" style="margin-bottom:16px;">
@@ -143,11 +122,11 @@
         <label>연 금리 (%)</label>
         <input type="number" id="rate" value="4.5" min="0" step="0.1" />
         <div class="quick-btns">
-          <button class="quick-btn" onclick="setVal('rate', 3.0)">3%</button>
-          <button class="quick-btn" onclick="setVal('rate', 4.0)">4%</button>
-          <button class="quick-btn" onclick="setVal('rate', 4.5)">4.5%</button>
-          <button class="quick-btn" onclick="setVal('rate', 5.0)">5%</button>
-          <button class="quick-btn" onclick="setVal('rate', 6.0)">6%</button>
+          <button class="quick-btn" onclick="setVal('rate',3.0)">3%</button>
+          <button class="quick-btn" onclick="setVal('rate',4.0)">4%</button>
+          <button class="quick-btn" onclick="setVal('rate',4.5)">4.5%</button>
+          <button class="quick-btn" onclick="setVal('rate',5.0)">5%</button>
+          <button class="quick-btn" onclick="setVal('rate',6.0)">6%</button>
         </div>
       </div>
       <div class="field">
@@ -162,33 +141,23 @@
           <option value="240">20년</option>
           <option value="300" selected>25년</option>
           <option value="360">30년</option>
-<option value="480">40년</option>
-<option value="600">50년</option>
+          <option value="480">40년</option>
+          <option value="600">50년</option>
         </select>
       </div>
     </div>
     <div class="field">
       <label>상환 방식</label>
       <div class="method-group">
-        <button class="method-btn active" id="btn-equal" onclick="setMethod('equal')">
-          원리금균등
-          <small>매달 같은 금액 납부</small>
-        </button>
-        <button class="method-btn" id="btn-principal" onclick="setMethod('principal')">
-          원금균등
-          <small>초기 납입액 높고 점점 줄어듦</small>
-        </button>
-        <button class="method-btn" id="btn-bullet" onclick="setMethod('bullet')">
-          만기일시상환
-          <small>매달 이자만 납부</small>
-        </button>
+        <button class="method-btn active" id="btn-equal" onclick="setMethod('equal')">원리금균등<small>매달 같은 금액</small></button>
+        <button class="method-btn" id="btn-principal" onclick="setMethod('principal')">원금균등<small>초기 납입액 높음</small></button>
+        <button class="method-btn" id="btn-bullet" onclick="setMethod('bullet')">만기일시상환<small>매달 이자만 납부</small></button>
       </div>
     </div>
     <button class="calc-btn" onclick="calculate()">계산하기</button>
   </div>
 
   <div id="result-area" class="hidden">
-
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
       <div style="background:var(--green);border-radius:var(--radius);padding:1.5rem;text-align:center;color:white;">
         <div style="font-size:13px;opacity:0.85;margin-bottom:6px;" id="monthly-label">첫 달 납입금</div>
@@ -201,20 +170,16 @@
         <div style="font-size:12px;opacity:0.75;margin-top:4px;" id="interest-rate-label"></div>
       </div>
     </div>
-
     <div class="metrics" id="metrics"></div>
-
     <div class="card">
       <div class="section-label">납입금 구성</div>
       <div id="bars"></div>
     </div>
-
     <div class="card">
       <div class="section-label">상환 방식 비교</div>
       <div id="compare"></div>
       <div class="info-box">원금균등 방식이 총 이자가 적지만 초기 납입 부담이 크고, 원리금균등 방식은 매달 납입액이 일정해 예측이 쉬워요.</div>
     </div>
-
     <div class="card">
       <div class="section-label">상환 스케줄 <span id="schedule-count" style="font-weight:400;color:var(--text3);"></span></div>
       <div class="schedule-wrap">
@@ -222,188 +187,63 @@
       </div>
       <span class="schedule-toggle" id="schedule-toggle" onclick="toggleSchedule()">▼ 전체 보기</span>
     </div>
+  </div>
 
+  <!-- 설명글 -->
+  <div class="guide">
+    <h2>대출이자 계산기 이용 방법</h2>
+    <p>대출이자 계산기는 대출금액, 금리, 상환기간을 입력하면 월 납입금과 총 이자를 자동으로 계산합니다. 주택담보대출, 신용대출, 전세자금대출 등 다양한 대출에 활용할 수 있습니다.</p>
+
+    <h3>📌 원리금균등 상환이란?</h3>
+    <p>매달 동일한 금액을 납부하는 방식입니다. 초기에는 이자 비중이 높고 원금 비중이 낮지만, 시간이 지날수록 원금 비중이 높아집니다. 매달 납입금이 일정해 가계 지출 계획을 세우기 쉽다는 장점이 있습니다. 주택담보대출에서 가장 많이 사용되는 방식입니다.</p>
+
+    <h3>📌 원금균등 상환이란?</h3>
+    <p>매달 동일한 원금을 상환하고 여기에 남은 잔액에 대한 이자를 더해 납부하는 방식입니다. 초기 납입금이 높지만 시간이 지날수록 줄어듭니다. 원리금균등 방식보다 총 이자가 적어 유리하지만, 초기 부담이 크다는 단점이 있습니다.</p>
+
+    <h3>📌 만기일시상환이란?</h3>
+    <p>대출 기간 동안 이자만 납부하다가 만기에 원금 전액을 한 번에 상환하는 방식입니다. 매달 납입금이 가장 적지만 총 이자가 가장 많습니다. 단기 자금이 필요하거나 만기에 목돈을 마련할 수 있는 경우에 적합합니다.</p>
+
+    <div class="guide-box">
+      <p>💡 금리가 1%p 오르면 3억원 30년 대출 기준 월 납입금이 약 16만원 증가합니다. 금리 변동에 주의하세요.</p>
+    </div>
+
+    <h2 style="margin-top:2rem;">자주 묻는 질문 (FAQ)</h2>
+    <div class="faq-item">
+      <div class="faq-q">Q. 원리금균등과 원금균등 중 어떤 게 유리한가요?</div>
+      <div class="faq-a">총 이자 부담만 보면 원금균등이 유리합니다. 하지만 초기 납입 부담이 크기 때문에 소득 대비 상환 여력을 고려해야 합니다. 소득이 안정적이고 초기 납입 여력이 있다면 원금균등, 그렇지 않다면 원리금균등이 적합합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 중도상환하면 이자가 줄어드나요?</div>
+      <div class="faq-a">네, 중도상환을 하면 잔여 원금이 줄어 이후 발생하는 이자가 감소합니다. 다만 대부분의 대출 상품은 일정 기간 내 중도상환 시 수수료가 발생하므로 중도상환 수수료와 절감되는 이자를 비교해보는 것이 좋습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. DSR이란 무엇인가요?</div>
+      <div class="faq-a">DSR(총부채원리금상환비율)은 연간 소득 대비 모든 대출의 원리금 상환액 비율입니다. 현재 금융권 대출 시 DSR 40%(은행 기준)를 초과하면 대출이 제한됩니다. 예를 들어 연소득 5,000만원이면 연간 원리금 상환액이 2,000만원(월 약 167만원)을 넘지 않아야 합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 변동금리와 고정금리 중 어떤 것이 좋나요?</div>
+      <div class="faq-a">고정금리는 대출 기간 내내 금리가 변하지 않아 안정적이지만 초기 금리가 높은 편입니다. 변동금리는 시장 금리에 따라 변동되어 금리 하락 시 유리하지만 상승 리스크가 있습니다. 금리 상승이 예상되거나 장기 대출이라면 고정금리가, 금리 하락이 예상되거나 단기 대출이라면 변동금리가 유리할 수 있습니다.</div>
+    </div>
   </div>
 </main>
-
 <footer>
   본 계산기는 참고용이며 실제 대출 조건과 다를 수 있습니다.<br>
   <a href="/privacy.html">개인정보처리방침</a> · <a href="/">홈으로</a>
 </footer>
-
 <script>
-let method = 'equal';
-let fullSchedule = [];
-let showFull = false;
-
-function setVal(id, val) { document.getElementById(id).value = val; }
-
-function setMethod(m) {
-  method = m;
-  ['equal','principal','bullet'].forEach(t => {
-    document.getElementById('btn-'+t).classList.toggle('active', t === m);
-  });
-}
-
-function fmt(n)    { return Math.round(n).toLocaleString('ko-KR') + '원'; }
-function fmtNo(n)  { return Math.round(n).toLocaleString('ko-KR'); }
-
-function calculate() {
-  const P = parseFloat(document.getElementById('principal').value) || 0;
-  const annualRate = parseFloat(document.getElementById('rate').value) || 0;
-  const n = parseInt(document.getElementById('period').value);
-  const r = annualRate / 100 / 12;
-
-  let schedule = [];
-
-  if (method === 'equal') {
-    // 원리금균등
-    const M = r === 0 ? P/n : P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
-    let balance = P;
-    for (let i = 1; i <= n; i++) {
-      const interest = balance * r;
-      const principal = M - interest;
-      balance -= principal;
-      schedule.push({ month:i, payment:Math.round(M), principal:Math.round(principal), interest:Math.round(interest), balance:Math.max(0,Math.round(balance)) });
-    }
-    document.getElementById('monthly-label').textContent = '월 납입금 (고정)';
-    document.getElementById('monthly-payment').textContent = fmt(M);
-    document.getElementById('monthly-sub').textContent = `매달 동일하게 납부`;
-
-  } else if (method === 'principal') {
-    // 원금균등
-    const monthlyPrincipal = P / n;
-    let balance = P;
-    for (let i = 1; i <= n; i++) {
-      const interest = balance * r;
-      const payment = monthlyPrincipal + interest;
-      balance -= monthlyPrincipal;
-      schedule.push({ month:i, payment:Math.round(payment), principal:Math.round(monthlyPrincipal), interest:Math.round(interest), balance:Math.max(0,Math.round(balance)) });
-    }
-    document.getElementById('monthly-label').textContent = '첫 달 납입금';
-    document.getElementById('monthly-payment').textContent = fmt(schedule[0].payment);
-    document.getElementById('monthly-sub').textContent = `마지막 달 ${fmt(schedule[n-1].payment)}`;
-
-  } else {
-    // 만기일시상환
-    const monthlyInterest = P * r;
-    for (let i = 1; i <= n; i++) {
-      const isLast = i === n;
-      schedule.push({ month:i, payment:Math.round(isLast ? P + monthlyInterest : monthlyInterest), principal:Math.round(isLast ? P : 0), interest:Math.round(monthlyInterest), balance:isLast ? 0 : P });
-    }
-    document.getElementById('monthly-label').textContent = '월 이자 납입금';
-    document.getElementById('monthly-payment').textContent = fmt(monthlyInterest);
-    document.getElementById('monthly-sub').textContent = `만기 시 원금 ${fmt(P)} 일시 상환`;
-  }
-
-  fullSchedule = schedule;
-  const totalPayment = schedule.reduce((s, r) => s + r.payment, 0);
-  const totalInterest = schedule.reduce((s, r) => s + r.interest, 0);
-  const interestRatio = (totalInterest / P * 100).toFixed(1);
-
-  document.getElementById('total-interest').textContent = fmt(totalInterest);
-  document.getElementById('interest-rate-label').textContent = `원금 대비 ${interestRatio}%`;
-
-  document.getElementById('metrics').innerHTML = `
-    <div class="metric blue"><div class="metric-label">대출 원금</div><div class="metric-value">${fmt(P)}</div></div>
-    <div class="metric red"><div class="metric-label">총 납입액</div><div class="metric-value">${fmt(totalPayment)}</div></div>
-    <div class="metric amber"><div class="metric-label">대출 기간</div><div class="metric-value">${n >= 12 ? Math.floor(n/12)+'년' : ''}${n%12 ? (n%12)+'개월' : ''}</div></div>
-  `;
-
-  document.getElementById('bars').innerHTML = [
-    { label:'대출 원금', val:P,             color:'#2563eb' },
-    { label:'총 이자',   val:totalInterest, color:'#dc2626' },
-    { label:'총 납입',   val:totalPayment,  color:'#0d9488' },
-  ].map(item => `
-    <div class="bar-row">
-      <span class="bar-label">${item.label}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(item.val/totalPayment)*100).toFixed(1)}%;background:${item.color};"></div></div>
-      <span class="bar-val">${fmt(item.val)}</span>
-    </div>
-  `).join('');
-
-  // 상환방식 비교
-  const calcEqual = () => {
-    const M = r === 0 ? P/n : P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
-    return { monthly: M, total: M*n, interest: M*n - P };
-  };
-  const calcPrincipal = () => {
-    let ti = 0, bal = P;
-    for (let i=0;i<n;i++) { ti += bal*r; bal -= P/n; }
-    return { monthly: P/n + P*r, total: P+ti, interest: ti };
-  };
-  const calcBullet = () => {
-    const mi = P*r;
-    return { monthly: mi, total: P + mi*n, interest: mi*n };
-  };
-  const eq = calcEqual(), pr = calcPrincipal(), bl = calcBullet();
-  const methods = [
-    { name:'원리금균등', color:'var(--green)', data:eq,  desc:'매달 고정 납입' },
-    { name:'원금균등',   color:'var(--blue)',  data:pr,  desc:'초기 부담 높음' },
-    { name:'만기일시',   color:'var(--amber)', data:bl,  desc:'만기에 원금 납부' },
-  ];
-  document.getElementById('compare').innerHTML = methods.map(m => `
-    <div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:10px;${method === (['equal','principal','bullet'][methods.indexOf(m)]) ? 'border-color:var(--green);background:var(--green-light);' : ''}">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-weight:600;font-size:14px;color:${m.color};">${m.name}</span>
-        <span style="font-size:12px;color:var(--text3);">${m.desc}</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px;">
-        <div><div style="color:var(--text3);margin-bottom:2px;">첫 달 납입</div><div style="font-weight:600;">${fmt(m.data.monthly)}</div></div>
-        <div><div style="color:var(--text3);margin-bottom:2px;">총 이자</div><div style="font-weight:600;color:var(--red);">${fmt(m.data.interest)}</div></div>
-        <div><div style="color:var(--text3);margin-bottom:2px;">총 납입액</div><div style="font-weight:600;">${fmt(m.data.total)}</div></div>
-      </div>
-    </div>
-  `).join('');
-
-  // 스케줄 테이블
-  renderSchedule(false);
-  document.getElementById('schedule-count').textContent = `(총 ${n}회)`;
-
-  document.getElementById('result-area').classList.remove('hidden');
-  document.getElementById('result-area').scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-function renderSchedule(full) {
-  const data = full ? fullSchedule : fullSchedule.slice(0, 12);
-  document.getElementById('schedule-table').innerHTML = `
-    <thead>
-      <tr>
-        <th>회차</th>
-        <th>납입금</th>
-        <th>원금</th>
-        <th>이자</th>
-        <th>잔여원금</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${data.map(r => `
-        <tr>
-          <td>${r.month}회</td>
-          <td>${fmtNo(r.payment)}원</td>
-          <td>${fmtNo(r.principal)}원</td>
-          <td>${fmtNo(r.interest)}원</td>
-          <td>${fmtNo(r.balance)}원</td>
-        </tr>
-      `).join('')}
-      ${full ? `
-        <tr>
-          <td>합계</td>
-          <td>${fmtNo(fullSchedule.reduce((s,r)=>s+r.payment,0))}원</td>
-          <td>${fmtNo(fullSchedule.reduce((s,r)=>s+r.principal,0))}원</td>
-          <td>${fmtNo(fullSchedule.reduce((s,r)=>s+r.interest,0))}원</td>
-          <td>-</td>
-        </tr>
-      ` : ''}
-    </tbody>
-  `;
-}
-
-function toggleSchedule() {
-  showFull = !showFull;
-  renderSchedule(showFull);
-  document.getElementById('schedule-toggle').textContent = showFull ? '▲ 접기' : '▼ 전체 보기';
-}
+let method='equal',fullSchedule=[],showFull=false;
+function setVal(id,val){document.getElementById(id).value=val;}
+function setMethod(m){method=m;['equal','principal','bullet'].forEach(t=>{document.getElementById('btn-'+t).classList.toggle('active',t===m);});}
+function fmt(n){return Math.round(n).toLocaleString('ko-KR')+'원';}
+function fmtNo(n){return Math.round(n).toLocaleString('ko-KR');}
+function calculate(){const P=parseFloat(document.getElementById('principal').value)||0;const annualRate=parseFloat(document.getElementById('rate').value)||0;const n=parseInt(document.getElementById('period').value);const r=annualRate/100/12;let schedule=[];if(method==='equal'){const M=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);let balance=P;for(let i=1;i<=n;i++){const interest=balance*r;const principal=M-interest;balance-=principal;schedule.push({month:i,payment:Math.round(M),principal:Math.round(principal),interest:Math.round(interest),balance:Math.max(0,Math.round(balance))});}document.getElementById('monthly-label').textContent='월 납입금 (고정)';document.getElementById('monthly-payment').textContent=fmt(M);document.getElementById('monthly-sub').textContent='매달 동일하게 납부';}else if(method==='principal'){const monthlyPrincipal=P/n;let balance=P;for(let i=1;i<=n;i++){const interest=balance*r;const payment=monthlyPrincipal+interest;balance-=monthlyPrincipal;schedule.push({month:i,payment:Math.round(payment),principal:Math.round(monthlyPrincipal),interest:Math.round(interest),balance:Math.max(0,Math.round(balance))});}document.getElementById('monthly-label').textContent='첫 달 납입금';document.getElementById('monthly-payment').textContent=fmt(schedule[0].payment);document.getElementById('monthly-sub').textContent=`마지막 달 ${fmt(schedule[n-1].payment)}`;}else{const monthlyInterest=P*r;for(let i=1;i<=n;i++){const isLast=i===n;schedule.push({month:i,payment:Math.round(isLast?P+monthlyInterest:monthlyInterest),principal:Math.round(isLast?P:0),interest:Math.round(monthlyInterest),balance:isLast?0:P});}document.getElementById('monthly-label').textContent='월 이자 납입금';document.getElementById('monthly-payment').textContent=fmt(P*r);document.getElementById('monthly-sub').textContent=`만기 시 원금 ${fmt(P)} 일시 상환`;}
+fullSchedule=schedule;const totalPayment=schedule.reduce((s,r)=>s+r.payment,0);const totalInterest=schedule.reduce((s,r)=>s+r.interest,0);document.getElementById('total-interest').textContent=fmt(totalInterest);document.getElementById('interest-rate-label').textContent=`원금 대비 ${(totalInterest/P*100).toFixed(1)}%`;document.getElementById('metrics').innerHTML=`<div class="metric blue"><div class="metric-label">대출 원금</div><div class="metric-value">${fmt(P)}</div></div><div class="metric red"><div class="metric-label">총 납입액</div><div class="metric-value">${fmt(totalPayment)}</div></div><div class="metric amber"><div class="metric-label">대출 기간</div><div class="metric-value">${n>=12?Math.floor(n/12)+'년':''}${n%12?(n%12)+'개월':''}</div></div>`;
+document.getElementById('bars').innerHTML=[{label:'대출 원금',val:P,color:'#2563eb'},{label:'총 이자',val:totalInterest,color:'#dc2626'},{label:'총 납입',val:totalPayment,color:'#0d9488'}].map(item=>`<div class="bar-row"><span class="bar-label">${item.label}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(item.val/totalPayment)*100).toFixed(1)}%;background:${item.color};"></div></div><span class="bar-val">${fmt(item.val)}</span></div>`).join('');
+const calcEqual=()=>{const M=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);return{monthly:M,total:M*n,interest:M*n-P};};const calcPrincipal=()=>{let ti=0,bal=P;for(let i=0;i<n;i++){ti+=bal*r;bal-=P/n;}return{monthly:P/n+P*r,total:P+ti,interest:ti};};const calcBullet=()=>{const mi=P*r;return{monthly:mi,total:P+mi*n,interest:mi*n};};const eq=calcEqual(),pr=calcPrincipal(),bl=calcBullet();const methods=[{name:'원리금균등',color:'var(--green)',data:eq,key:'equal'},{name:'원금균등',color:'var(--blue)',data:pr,key:'principal'},{name:'만기일시',color:'var(--amber)',data:bl,key:'bullet'}];
+document.getElementById('compare').innerHTML=methods.map(m=>`<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:10px;${method===m.key?'border-color:var(--green);background:var(--green-light);':''}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-weight:600;font-size:14px;color:${m.color};">${m.name}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px;"><div><div style="color:var(--text3);margin-bottom:2px;">첫 달 납입</div><div style="font-weight:600;">${fmt(m.data.monthly)}</div></div><div><div style="color:var(--text3);margin-bottom:2px;">총 이자</div><div style="font-weight:600;color:var(--red);">${fmt(m.data.interest)}</div></div><div><div style="color:var(--text3);margin-bottom:2px;">총 납입액</div><div style="font-weight:600;">${fmt(m.data.total)}</div></div></div></div>`).join('');
+renderSchedule(false);document.getElementById('schedule-count').textContent=`(총 ${n}회)`;document.getElementById('result-area').classList.remove('hidden');document.getElementById('result-area').scrollIntoView({behavior:'smooth',block:'start'});}
+function renderSchedule(full){const data=full?fullSchedule:fullSchedule.slice(0,12);document.getElementById('schedule-table').innerHTML=`<thead><tr><th>회차</th><th>납입금</th><th>원금</th><th>이자</th><th>잔여원금</th></tr></thead><tbody>${data.map(r=>`<tr><td>${r.month}회</td><td>${fmtNo(r.payment)}원</td><td>${fmtNo(r.principal)}원</td><td>${fmtNo(r.interest)}원</td><td>${fmtNo(r.balance)}원</td></tr>`).join('')}${full?`<tr><td>합계</td><td>${fmtNo(fullSchedule.reduce((s,r)=>s+r.payment,0))}원</td><td>${fmtNo(fullSchedule.reduce((s,r)=>s+r.principal,0))}원</td><td>${fmtNo(fullSchedule.reduce((s,r)=>s+r.interest,0))}원</td><td>-</td></tr>`:''}</tbody>`;}
+function toggleSchedule(){showFull=!showFull;renderSchedule(showFull);document.getElementById('schedule-toggle').textContent=showFull?'▲ 접기':'▼ 전체 보기';}
 </script>
 </body>
 </html>
