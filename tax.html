@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>연말정산 모의 계산기 — 환급액 추가납부액 미리 계산</title>
+  <meta name="description" content="연봉, 신용카드, 의료비, 교육비, 주택청약, 주택대출이자, 연금저축 등 공제 항목을 입력하면 연말정산 예상 환급액 또는 추가납부액을 계산합니다." />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f7fa; --surface: #ffffff; --surface2: #f0f3f8; --border: #e2e8f0;
+      --text: #1a202c; --text2: #64748b; --text3: #94a3b8;
+      --green: #0d9488; --green-light: #f0fdfa;
+      --blue: #2563eb; --blue-light: #eff6ff;
+      --red: #dc2626; --red-light: #fef2f2;
+      --amber: #d97706; --amber-light: #fffbeb;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .header-top { max-width: 980px; margin: 0 auto; padding: 1rem 1.5rem; }
+    .logo { font-size: 20px; font-weight: 600; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--green); }
+    nav { border-top: 1px solid var(--border); }
+    .nav-inner { max-width: 980px; margin: 0 auto; padding: 0 1.5rem; display: flex; overflow-x: auto; scrollbar-width: none; }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-item { display: flex; align-items: center; gap: 6px; padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--text2); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .nav-item:hover { color: var(--text); background: var(--surface2); }
+    .nav-item.active { color: var(--green); border-bottom-color: var(--green); }
+    .nav-badge { font-size: 10px; background: var(--surface2); color: var(--text3); padding: 1px 6px; border-radius: 10px; }
+    main { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .hero { text-align: center; margin-bottom: 2rem; }
+    .hero h1 { font-size: 28px; font-weight: 600; margin-bottom: 0.5rem; }
+    .hero p { color: var(--text2); }
+    .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--green); color: white; border-radius: 50%; font-size: 13px; font-weight: 600; margin-right: 8px; flex-shrink: 0; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+    .card-title { display: flex; align-items: center; font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; }
+    .section-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { font-size: 13px; color: var(--text2); font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+    .field label span { color: var(--text3); font-weight: 400; font-size: 11px; }
+    input[type="number"], select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
+    input[type="number"]:focus, select:focus { border-color: var(--green); }
+    .input-hint { font-size: 12px; color: var(--text3); margin-top: 3px; }
+    .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+    .calc-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s; }
+    .calc-btn:hover { opacity: 0.9; }
+    .result-hero { border-radius: var(--radius); padding: 2rem; text-align: center; margin-bottom: 1rem; color: white; }
+    .result-hero.refund { background: var(--green); }
+    .result-hero.pay { background: var(--red); }
+    .result-hero-label { font-size: 15px; opacity: 0.9; margin-bottom: 8px; }
+    .result-hero-value { font-size: 46px; font-weight: 700; margin-bottom: 6px; }
+    .result-hero-sub { font-size: 13px; opacity: 0.8; }
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 1rem; }
+    .metric { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
+    .metric.green { background: var(--green-light); border-color: #99f6e4; }
+    .metric.blue  { background: var(--blue-light);  border-color: #bfdbfe; }
+    .metric.red   { background: var(--red-light);   border-color: #fecaca; }
+    .metric.amber { background: var(--amber-light);  border-color: #fde68a; }
+    .metric-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; font-weight: 500; }
+    .metric-value { font-size: 20px; font-weight: 600; }
+    .metric.green .metric-value { color: var(--green); }
+    .metric.blue  .metric-value { color: var(--blue); }
+    .metric.red   .metric-value { color: var(--red); }
+    .metric.amber .metric-value { color: var(--amber); }
+    .deduct-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .deduct-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--text3); border-bottom: 1px solid var(--border); }
+    .deduct-table th:last-child { text-align: right; }
+    .deduct-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+    .deduct-table td:last-child { text-align: right; font-weight: 600; color: var(--blue); }
+    .deduct-table .total-row td { border-bottom: none; font-weight: 700; background: var(--surface2); color: var(--text); }
+    .deduct-table .total-row td:last-child { color: var(--green); }
+    .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .bar-label { font-size: 13px; color: var(--text2); width: 100px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 10px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 5px; transition: width 0.4s ease; }
+    .bar-val { font-size: 13px; font-weight: 600; min-width: 80px; text-align: right; }
+    .tip-box { background: var(--amber-light); border-left: 3px solid var(--amber); padding: 14px 16px; border-radius: 0 8px 8px 0; margin-top: 1rem; font-size: 13px; color: #92400e; line-height: 1.7; }
+    .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-top: 2rem; }
+    .guide h2 { font-size: 20px; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+    .guide h3 { font-size: 16px; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--green); }
+    .guide p { color: var(--text2); font-size: 14px; line-height: 1.8; margin-bottom: 0.75rem; }
+    .guide ul { color: var(--text2); font-size: 14px; line-height: 1.8; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .guide li { margin-bottom: 0.3rem; }
+    .guide-box { background: var(--green-light); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+    .guide-box p { color: var(--text); margin: 0; font-size: 14px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 600; font-size: 14px; margin-bottom: 0.5rem; }
+    .faq-a { font-size: 14px; color: var(--text2); line-height: 1.8; }
+    .hidden { display: none; }
+    footer { text-align: center; padding: 2rem; color: var(--text3); font-size: 12px; border-top: 1px solid var(--border); margin-top: 2rem; }
+    footer a { color: var(--green); text-decoration: none; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <a class="logo" href="/">계산기<span>모음</span></a>
+  </div>
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-item" href="/">💰 배당금 계산기</a>
+      <a class="nav-item" href="/salary.html">💵 연봉 실수령액</a>
+      <a class="nav-item" href="/loan.html">🏦 대출이자 계산기</a>
+      <a class="nav-item" href="/retire.html">🏖️ 퇴직금 계산기 <span class="nav-badge">준비중</span></a>
+      <a class="nav-item active" href="/tax.html">📝 연말정산 계산기</a>
+      <a class="nav-item" href="/parttime.html">💼 알바수당 계산기 <span class="nav-badge">준비중</span></a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>연말정산 모의 계산기</h1>
+    <p>공제 항목을 입력하면 예상 환급액 또는 추가납부액을 미리 계산해 드려요</p>
+  </div>
+
+  <!-- STEP 1 기본 정보 -->
+  <div class="card">
+    <div class="card-title"><span class="step-badge">1</span> 기본 정보</div>
+    <div class="grid2">
+      <div class="field">
+        <label>연봉 (세전) <span>총급여액</span></label>
+        <input type="number" id="salary" value="50000000" step="1000000" />
+      </div>
+      <div class="field">
+        <label>부양가족 수 <span>본인 포함</span></label>
+        <select id="dependents">
+          <option value="1">1명 (본인만)</option>
+          <option value="2">2명</option>
+          <option value="3">3명</option>
+          <option value="4">4명</option>
+          <option value="5">5명 이상</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>20세 이하 자녀 수</label>
+        <select id="children">
+          <option value="0">없음</option>
+          <option value="1">1명</option>
+          <option value="2">2명</option>
+          <option value="3">3명 이상</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>이미 납부한 소득세 <span>원천징수 합계</span></label>
+        <input type="number" id="paidTax" value="0" step="10000" />
+        <div class="input-hint">모르면 0으로 두세요</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 신용카드 소득공제 -->
+  <div class="card">
+    <div class="card-title"><span class="step-badge">2</span> 신용카드 · 체크카드 소득공제</div>
+    <div class="grid2">
+      <div class="field">
+        <label>신용카드 사용액 <span>연간 합계</span></label>
+        <input type="number" id="creditCard" value="0" step="100000" />
+      </div>
+      <div class="field">
+        <label>체크카드 · 현금영수증 <span>연간 합계</span></label>
+        <input type="number" id="debitCard" value="0" step="100000" />
+      </div>
+    </div>
+    <div class="input-hint">💡 총급여 25% 초과분부터 공제 · 신용카드 15% / 체크카드·현금영수증 30% 공제율</div>
+  </div>
+
+  <!-- STEP 3 세액공제 -->
+  <div class="card">
+    <div class="card-title"><span class="step-badge">3</span> 세액공제 항목</div>
+
+    <!-- 의료비 -->
+    <div class="section-label">🏥 의료비</div>
+    <div class="grid2">
+      <div class="field">
+        <label>의료비 지출액 <span>연간 합계</span></label>
+        <input type="number" id="medical" value="0" step="100000" />
+        <div class="input-hint">총급여 3% 초과분의 15% 공제</div>
+      </div>
+      <div class="field">
+        <label>난임시술비 <span>별도 입력</span></label>
+        <input type="number" id="infertility" value="0" step="100000" />
+        <div class="input-hint">30% 공제율 적용</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 교육비 -->
+    <div class="section-label">📚 교육비</div>
+    <div class="grid2">
+      <div class="field">
+        <label>본인 교육비 <span>대학원 포함</span></label>
+        <input type="number" id="eduSelf" value="0" step="100000" />
+        <div class="input-hint">한도 없음 · 15% 공제</div>
+      </div>
+      <div class="field">
+        <label>자녀 교육비 <span>1인당 300만원 한도</span></label>
+        <input type="number" id="eduChild" value="0" step="100000" />
+        <div class="input-hint">15% 공제</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 주택 관련 -->
+    <div class="section-label">🏠 주택 관련</div>
+    <div class="grid2">
+      <div class="field">
+        <label>주택청약 납입액 <span>연 240만원 한도</span></label>
+        <input type="number" id="housing" value="0" step="100000" />
+        <div class="input-hint">총급여 7천만원 이하 · 40% 공제</div>
+      </div>
+      <div class="field">
+        <label>월세 납입액 <span>연간 합계</span></label>
+        <input type="number" id="rent" value="0" step="100000" />
+        <div class="input-hint">총급여 8천만원 이하 · 17~20% 공제</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>주택담보대출 이자상환액 <span>연간 합계</span></label>
+        <input type="number" id="mortgageInterest" value="0" step="100000" />
+        <div class="input-hint">상환기간 15년 이상 · 최대 1,800만원 소득공제</div>
+      </div>
+      <div class="field">
+        <label>대출 상환기간</label>
+        <select id="mortgageType">
+          <option value="0">해당없음</option>
+          <option value="600">15년 이상 고정금리·비거치식 (한도 1,800만원)</option>
+          <option value="1500">15년 이상 고정금리 또는 비거치식 (한도 1,500만원)</option>
+          <option value="500">15년 이상 기타 (한도 500만원)</option>
+          <option value="300">10~15년 (한도 300만원)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 연금저축 -->
+    <div class="section-label">💰 연금 · 퇴직연금</div>
+    <div class="grid2">
+      <div class="field">
+        <label>연금저축펀드 납입액 <span>연간 합계</span></label>
+        <input type="number" id="pension" value="0" step="100000" />
+        <div class="input-hint">연 600만원 한도 · 16.5% 세액공제 (총급여 5,500만원 이하)</div>
+      </div>
+      <div class="field">
+        <label>IRP 추가납입액 <span>연간 합계</span></label>
+        <input type="number" id="irp" value="0" step="100000" />
+        <div class="input-hint">연금저축+IRP 합산 900만원 한도</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 기부금 · 보험료 -->
+    <div class="section-label">❤️ 기부금 · 보험료</div>
+    <div class="grid2">
+      <div class="field">
+        <label>기부금 <span>법정·지정기부금</span></label>
+        <input type="number" id="donation" value="0" step="100000" />
+        <div class="input-hint">15% 공제 (1천만원 초과분 30%)</div>
+      </div>
+      <div class="field">
+        <label>보장성 보험료 <span>연 100만원 한도</span></label>
+        <input type="number" id="insurance" value="0" step="100000" />
+        <div class="input-hint">12% 공제</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">연말정산 계산하기</button>
+
+  <!-- 결과 -->
+  <div id="result-area" class="hidden" style="margin-top:1.5rem;">
+    <div class="result-hero" id="result-hero">
+      <div class="result-hero-label" id="result-label">예상 환급액</div>
+      <div class="result-hero-value" id="result-value">0원</div>
+      <div class="result-hero-sub" id="result-sub"></div>
+    </div>
+    <div class="metrics" id="metrics"></div>
+    <div class="card">
+      <div class="section-label">공제 항목별 절세액</div>
+      <table class="deduct-table">
+        <thead><tr><th>공제 항목</th><th style="text-align:right;">절세액</th></tr></thead>
+        <tbody id="deduct-body"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="section-label">세금 구성</div>
+      <div id="bars"></div>
+    </div>
+    <div class="tip-box" id="tip-box"></div>
+  </div>
+
+  <!-- 설명글 -->
+  <div class="guide">
+    <h2>연말정산 계산기 이용 방법</h2>
+    <p>연말정산은 한 해 동안 납부한 근로소득세를 정산하는 절차입니다. 각종 공제 항목을 적용해 실제 납부해야 할 세금을 계산하고, 이미 납부한 세금보다 더 냈으면 환급받고 덜 냈으면 추가 납부합니다.</p>
+
+    <h3>📌 주택담보대출 이자상환액 공제</h3>
+    <p>무주택 세대주 또는 1주택 세대주가 주택담보대출의 이자를 상환하는 경우 소득공제를 받을 수 있습니다. 대출 상환기간과 금리 조건에 따라 공제 한도가 달라집니다.</p>
+    <ul>
+      <li>고정금리 + 비거치식: 연간 최대 1,800만원 공제</li>
+      <li>고정금리 또는 비거치식 (택1): 연간 최대 1,500만원 공제</li>
+      <li>15년 이상 기타: 연간 최대 500만원 공제</li>
+      <li>10~15년: 연간 최대 300만원 공제</li>
+    </ul>
+
+    <h3>📌 연금저축펀드 세액공제</h3>
+    <p>연금저축펀드(ISA 포함)와 IRP(개인형 퇴직연금)에 납입한 금액은 세액공제를 받을 수 있습니다. 연금저축은 연 600만원, 연금저축+IRP 합산 연 900만원이 한도입니다.</p>
+    <ul>
+      <li>총급여 5,500만원 이하: 납입액의 16.5% 세액공제</li>
+      <li>총급여 5,500만원 초과: 납입액의 13.2% 세액공제</li>
+    </ul>
+
+    <div class="guide-box">
+      <p>💡 연금저축 900만원 최대 납입 시, 총급여 5,500만원 이하라면 최대 148만원(16.5%)의 세액을 돌려받을 수 있어요!</p>
+    </div>
+
+    <h3>📌 소득공제 vs 세액공제</h3>
+    <p>소득공제는 과세 대상 소득 자체를 줄여주고, 세액공제는 계산된 세금에서 직접 차감합니다. 연금저축·IRP·월세는 세액공제라 절세 효과가 더 직접적입니다.</p>
+
+    <h2 style="margin-top:2rem;">자주 묻는 질문 (FAQ)</h2>
+    <div class="faq-item">
+      <div class="faq-q">Q. 연금저축펀드와 IRP의 차이는?</div>
+      <div class="faq-a">연금저축펀드는 증권사나 은행에서 가입하며 주식형 펀드 등 다양한 상품에 투자할 수 있습니다. IRP는 퇴직연금 계좌로 예금·펀드 등에 투자할 수 있으며 위험자산 투자 비중이 70%로 제한됩니다. 세액공제 측면에서는 연금저축 단독으로 600만원, IRP를 추가하면 합산 900만원까지 공제받을 수 있습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 주택담보대출 이자공제를 받으려면?</div>
+      <div class="faq-a">무주택 또는 1주택 세대주로서 취득 당시 기준시가 5억원 이하 주택에 대한 대출이어야 합니다. 금융기관에서 발급하는 이자납입증명서를 회사에 제출하면 됩니다. 고정금리 또는 비거치식 상환 대출일수록 공제 한도가 높으니 대출 조건을 확인해보세요.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 연말정산은 언제 하나요?</div>
+      <div class="faq-a">매년 1~2월에 진행됩니다. 국세청 홈택스에서 간소화 서비스를 통해 공제 자료를 조회하고, 회사에 제출하면 됩니다. 2월 급여에 환급 또는 추가납부가 반영됩니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 추가납부가 발생하는 이유는?</div>
+      <div class="faq-a">매달 원천징수된 세금이 실제 납부해야 할 세금보다 적으면 추가납부가 발생합니다. 연금저축·IRP·주택대출이자 공제를 적극 활용하면 추가납부액을 줄일 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  본 계산기는 2026년 귀속 연말정산 기준 참고용이며 실제 세액과 다를 수 있습니다.<br>
+  <a href="/privacy.html">개인정보처리방침</a> · <a href="/">홈으로</a>
+</footer>
+
+<script>
+function fmt(n) { return Math.round(Math.abs(n)).toLocaleString('ko-KR') + '원'; }
+
+function calculate() {
+  const salary          = parseFloat(document.getElementById('salary').value) || 0;
+  const dependents      = parseInt(document.getElementById('dependents').value);
+  const children        = parseInt(document.getElementById('children').value);
+  const paidTax         = parseFloat(document.getElementById('paidTax').value) || 0;
+  const creditCard      = parseFloat(document.getElementById('creditCard').value) || 0;
+  const debitCard       = parseFloat(document.getElementById('debitCard').value) || 0;
+  const medical         = parseFloat(document.getElementById('medical').value) || 0;
+  const infertility     = parseFloat(document.getElementById('infertility').value) || 0;
+  const eduSelf         = parseFloat(document.getElementById('eduSelf').value) || 0;
+  const eduChild        = parseFloat(document.getElementById('eduChild').value) || 0;
+  const housing         = parseFloat(document.getElementById('housing').value) || 0;
+  const rent            = parseFloat(document.getElementById('rent').value) || 0;
+  const mortgageInterest= parseFloat(document.getElementById('mortgageInterest').value) || 0;
+  const mortgageLimit   = parseInt(document.getElementById('mortgageType').value) || 0;
+  const pension         = parseFloat(document.getElementById('pension').value) || 0;
+  const irp             = parseFloat(document.getElementById('irp').value) || 0;
+  const donation        = parseFloat(document.getElementById('donation').value) || 0;
+  const insurance       = parseFloat(document.getElementById('insurance').value) || 0;
+
+  // ① 근로소득공제
+  let laborDeduct = 0;
+  if (salary <= 5000000) laborDeduct = salary * 0.7;
+  else if (salary <= 15000000) laborDeduct = 3500000 + (salary - 5000000) * 0.4;
+  else if (salary <= 45000000) laborDeduct = 7500000 + (salary - 15000000) * 0.15;
+  else if (salary <= 100000000) laborDeduct = 12000000 + (salary - 45000000) * 0.05;
+  else laborDeduct = 14750000 + (salary - 100000000) * 0.02;
+  laborDeduct = Math.min(laborDeduct, 20000000);
+
+  // ② 인적공제
+  const personalDeduct = dependents * 1500000;
+
+  // ③ 신용카드 소득공제
+  const cardThreshold = salary * 0.25;
+  const totalCard = creditCard + debitCard;
+  let cardDeduct = 0;
+  if (totalCard > cardThreshold) {
+    const excess = totalCard - cardThreshold;
+    const creditExcess = Math.max(0, creditCard - cardThreshold);
+    const debitExcess  = Math.max(0, excess - creditExcess);
+    cardDeduct = creditExcess * 0.15 + debitExcess * 0.30;
+    const cardLimit = salary <= 70000000 ? 3000000 : salary <= 120000000 ? 2500000 : 2000000;
+    cardDeduct = Math.min(cardDeduct, cardLimit);
+  }
+
+  // ④ 주택담보대출 이자 소득공제
+  const mortgageDeduct = mortgageLimit > 0 ? Math.min(mortgageInterest, mortgageLimit * 10000) : 0;
+
+  // ⑤ 과세표준
+  const taxableIncome = Math.max(0, salary - laborDeduct - personalDeduct - cardDeduct - mortgageDeduct);
+
+  // ⑥ 산출세액
+  let calcTax = 0;
+  if (taxableIncome <= 14000000) calcTax = taxableIncome * 0.06;
+  else if (taxableIncome <= 50000000) calcTax = 840000 + (taxableIncome - 14000000) * 0.15;
+  else if (taxableIncome <= 88000000) calcTax = 6240000 + (taxableIncome - 50000000) * 0.24;
+  else if (taxableIncome <= 150000000) calcTax = 15360000 + (taxableIncome - 88000000) * 0.35;
+  else if (taxableIncome <= 300000000) calcTax = 37060000 + (taxableIncome - 150000000) * 0.38;
+  else calcTax = 94060000 + (taxableIncome - 300000000) * 0.40;
+
+  // ⑦ 세액공제
+  // 의료비
+  const medicalBase   = Math.max(0, medical - salary * 0.03);
+  const medicalCredit = medicalBase * 0.15 + infertility * 0.30;
+
+  // 교육비
+  const eduSelfCredit  = eduSelf * 0.15;
+  const eduChildLimit  = Math.min(eduChild, 3000000 * Math.max(children, 1));
+  const eduCredit      = eduSelfCredit + eduChildLimit * 0.15;
+
+  // 주택청약
+  const housingCredit = salary <= 70000000 ? Math.min(housing, 2400000) * 0.40 : 0;
+
+  // 월세
+  const rentRate   = salary <= 55000000 ? 0.20 : salary <= 80000000 ? 0.17 : 0;
+  const rentCredit = rent * rentRate;
+
+  // 연금저축 + IRP
+  const pensionRate  = salary <= 55000000 ? 0.165 : 0.132;
+  const pensionLimit = Math.min(pension, 6000000);
+  const irpLimit     = Math.min(pension + irp, 9000000) - pensionLimit;
+  const pensionCredit = (pensionLimit + Math.max(0, irpLimit)) * pensionRate;
+
+  // 기부금
+  const donationCredit = donation <= 10000000
+    ? donation * 0.15
+    : 1500000 + (donation - 10000000) * 0.30;
+
+  // 보험료
+  const insuranceCredit = Math.min(insurance, 1000000) * 0.12;
+
+  // 자녀세액공제
+  let childCredit = 0;
+  if (children === 1) childCredit = 150000;
+  else if (children === 2) childCredit = 350000;
+  else if (children >= 3) childCredit = 650000;
+
+  const totalCredit   = medicalCredit + eduCredit + housingCredit + rentCredit + pensionCredit + donationCredit + insuranceCredit + childCredit;
+  const finalTax      = Math.max(0, calcTax - totalCredit);
+  const localTax      = finalTax * 0.1;
+  const totalFinalTax = finalTax + localTax;
+  const diff          = paidTax - totalFinalTax;
+  const isRefund      = diff >= 0;
+
+  // 결과 UI
+  const hero = document.getElementById('result-hero');
+  hero.className = 'result-hero ' + (isRefund ? 'refund' : 'pay');
+  document.getElementById('result-label').textContent  = isRefund ? '예상 환급액' : '예상 추가납부액';
+  document.getElementById('result-value').textContent  = (isRefund ? '+' : '-') + fmt(diff);
+  document.getElementById('result-sub').textContent    = paidTax > 0
+    ? `납부세액 ${fmt(paidTax)} − 결정세액 ${fmt(totalFinalTax)}`
+    : `결정세액 ${fmt(totalFinalTax)} (납부세액 입력 시 환급액 계산 가능)`;
+
+  document.getElementById('metrics').innerHTML = [
+    { label:'산출세액',    value: fmt(calcTax),      cls:'red'   },
+    { label:'총 세액공제', value: fmt(totalCredit),  cls:'blue'  },
+    { label:'결정세액',    value: fmt(finalTax),      cls:'amber' },
+    { label:'지방소득세',  value: fmt(localTax),      cls:'green' },
+  ].map(m => `<div class="metric ${m.cls}"><div class="metric-label">${m.label}</div><div class="metric-value">${m.value}</div></div>`).join('');
+
+  // 공제 테이블
+  const deductions = [
+    { name:'신용카드·체크카드 소득공제', amount: cardDeduct * (taxableIncome > 0 ? 0.15 : 0), raw: cardDeduct, isIncome: true },
+    { name:'주택담보대출 이자 소득공제', amount: mortgageDeduct * 0.15, raw: mortgageDeduct, isIncome: true },
+    { name:'의료비 세액공제',           amount: medicalCredit },
+    { name:'교육비 세액공제',           amount: eduCredit },
+    { name:'주택청약 세액공제',         amount: housingCredit },
+    { name:'월세 세액공제',             amount: rentCredit },
+    { name:'연금저축·IRP 세액공제',     amount: pensionCredit },
+    { name:'기부금 세액공제',           amount: donationCredit },
+    { name:'보험료 세액공제',           amount: insuranceCredit },
+    { name:'자녀 세액공제',             amount: childCredit },
+  ].filter(d => d.amount > 0 || (d.raw && d.raw > 0));
+
+  document.getElementById('deduct-body').innerHTML = deductions.map(d => {
+    const displayAmt = d.isIncome ? (d.raw > 0 ? `소득공제 ${fmt(d.raw)}` : '-') : fmt(d.amount);
+    const taxSave    = d.isIncome ? fmt(d.raw * 0.15) : fmt(d.amount);
+    return `<tr><td>${d.name}</td><td>${taxSave}</td></tr>`;
+  }).join('') + `<tr class="total-row"><td>합계 절세액</td><td style="text-align:right;color:var(--green);font-weight:700;">${fmt(totalCredit)}</td></tr>`;
+
+  // 바 차트
+  const barMax = Math.max(calcTax, 1);
+  document.getElementById('bars').innerHTML = [
+    { label:'산출세액',    val: calcTax,      color:'#dc2626' },
+    { label:'세액공제 합', val: totalCredit,  color:'#2563eb' },
+    { label:'결정세액',    val: finalTax,     color:'#d97706' },
+    { label:'지방소득세',  val: localTax,     color:'#94a3b8' },
+  ].map(item => `
+    <div class="bar-row">
+      <span class="bar-label">${item.label}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(item.val/barMax)*100).toFixed(1)}%;background:${item.color};"></div></div>
+      <span class="bar-val">${fmt(item.val)}</span>
+    </div>
+  `).join('');
+
+  // 절세 팁
+  const tips = [];
+  if (pension < 6000000) tips.push(`연금저축펀드를 연 ${fmt(6000000 - pension)} 더 납입하면 최대 ${fmt((6000000-pension)*pensionRate)} 추가 공제 가능해요!`);
+  if (irp === 0 && pension >= 6000000) tips.push('IRP에 추가 납입하면 최대 300만원까지 추가 세액공제를 받을 수 있어요!');
+  if (salary <= 70000000 && housing === 0) tips.push('주택청약 납입액의 40%를 공제받을 수 있어요!');
+  if (debitCard < creditCard) tips.push('체크카드 공제율(30%)이 신용카드(15%)보다 높아요. 연봉 25% 이상은 체크카드 활용이 유리해요!');
+  document.getElementById('tip-box').innerHTML = '💡 절세 팁<br>' + (tips.length > 0 ? tips.slice(0,2).join('<br>') : '공제 항목을 꼼꼼히 챙기면 더 많은 환급을 받을 수 있어요!');
+
+  document.getElementById('result-area').classList.remove('hidden');
+  document.getElementById('result-area').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
