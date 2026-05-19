@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>국민연금 예상 수령액 계산기 — 지금까지 납부 기준 65세 수령액</title>
+  <meta name="description" content="지금까지 납부한 기간과 금액을 입력하면, 추가 납부 없이 65세부터 받을 수 있는 국민연금 월 예상 수령액을 계산합니다." />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f7fa; --surface: #ffffff; --surface2: #f0f3f8; --border: #e2e8f0;
+      --text: #1a202c; --text2: #64748b; --text3: #94a3b8;
+      --green: #0d9488; --green-light: #f0fdfa;
+      --blue: #2563eb; --blue-light: #eff6ff;
+      --red: #dc2626; --red-light: #fef2f2;
+      --amber: #d97706; --amber-light: #fffbeb;
+      --purple: #7c3aed; --purple-light: #f5f3ff;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .header-top { max-width: 980px; margin: 0 auto; padding: 1rem 1.5rem; }
+    .logo { font-size: 20px; font-weight: 600; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--green); }
+    nav { border-top: 1px solid var(--border); }
+    .nav-inner { max-width: 980px; margin: 0 auto; padding: 0 1.5rem; display: flex; overflow-x: auto; scrollbar-width: none; }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-item { display: flex; align-items: center; gap: 6px; padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--text2); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .nav-item:hover { color: var(--text); background: var(--surface2); }
+    .nav-item.active { color: var(--green); border-bottom-color: var(--green); }
+    .nav-badge { font-size: 10px; background: var(--surface2); color: var(--text3); padding: 1px 6px; border-radius: 10px; }
+    main { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .hero { text-align: center; margin-bottom: 2rem; }
+    .hero h1 { font-size: 28px; font-weight: 600; margin-bottom: 0.5rem; }
+    .hero p { color: var(--text2); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+    .card-title { display: flex; align-items: center; font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; }
+    .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--green); color: white; border-radius: 50%; font-size: 13px; font-weight: 600; margin-right: 8px; flex-shrink: 0; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { font-size: 13px; color: var(--text2); font-weight: 500; display: flex; justify-content: space-between; }
+    .field label span { color: var(--text3); font-weight: 400; font-size: 11px; }
+    input[type="number"] { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
+    input:focus { border-color: var(--green); }
+    .input-hint { font-size: 12px; color: var(--text3); margin-top: 3px; }
+    .warn-hint { font-size: 12px; color: var(--red); margin-top: 3px; display: none; }
+    .guide-box { background: var(--green-light); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 1rem; }
+    .guide-box p { color: var(--text); margin: 0; font-size: 14px; line-height: 1.7; }
+    .warn-box { background: var(--red-light); border-left: 3px solid var(--red); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 1rem; font-size: 14px; color: #991b1b; display: none; }
+    .calc-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s; }
+    .calc-btn:hover { opacity: 0.9; }
+
+    .result-hero { background: linear-gradient(135deg, #0d9488, #0891b2); border-radius: var(--radius); padding: 2rem; text-align: center; margin-bottom: 1rem; color: white; }
+    .result-hero.warn { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+    .result-hero-label { font-size: 14px; opacity: 0.85; margin-bottom: 8px; }
+    .result-hero-value { font-size: 48px; font-weight: 700; margin-bottom: 6px; }
+    .result-hero-sub { font-size: 13px; opacity: 0.8; line-height: 1.7; }
+
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 1rem; }
+    .metric { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
+    .metric.green  { background: var(--green-light);  border-color: #99f6e4; }
+    .metric.blue   { background: var(--blue-light);   border-color: #bfdbfe; }
+    .metric.amber  { background: var(--amber-light);  border-color: #fde68a; }
+    .metric.purple { background: var(--purple-light); border-color: #ddd6fe; }
+    .metric.red    { background: var(--red-light);    border-color: #fecaca; }
+    .metric-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; font-weight: 500; }
+    .metric-value { font-size: 20px; font-weight: 600; }
+    .metric.green  .metric-value { color: var(--green); }
+    .metric.blue   .metric-value { color: var(--blue); }
+    .metric.amber  .metric-value { color: var(--amber); }
+    .metric.purple .metric-value { color: var(--purple); }
+    .metric.red    .metric-value { color: var(--red); }
+
+    .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .bar-label { font-size: 13px; color: var(--text2); width: 110px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 10px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 5px; transition: width 0.4s ease; }
+    .bar-val { font-size: 13px; font-weight: 600; min-width: 90px; text-align: right; }
+
+    .info-box { background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: #1e40af; margin-top: 1rem; line-height: 1.7; }
+    .amber-box { background: var(--amber-light); border-left: 3px solid var(--amber); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 1rem; font-size: 13px; color: #92400e; line-height: 1.7; }
+
+    .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-top: 2rem; }
+    .guide h2 { font-size: 20px; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+    .guide h3 { font-size: 16px; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--green); }
+    .guide p { color: var(--text2); font-size: 14px; line-height: 1.8; margin-bottom: 0.75rem; }
+    .guide ul { color: var(--text2); font-size: 14px; line-height: 1.8; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .guide li { margin-bottom: 0.4rem; }
+    .guide-box2 { background: var(--green-light); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+    .guide-box2 p { color: var(--text); margin: 0; font-size: 14px; line-height: 1.7; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 600; font-size: 14px; margin-bottom: 0.5rem; }
+    .faq-a { font-size: 14px; color: var(--text2); line-height: 1.8; }
+    .min-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 0.75rem 0; }
+    .min-table th { background: var(--surface2); padding: 8px 12px; text-align: left; font-weight: 600; font-size: 13px; color: var(--text2); border-bottom: 1px solid var(--border); }
+    .min-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+    .min-table tr:last-child td { border-bottom: none; }
+    .hidden { display: none; }
+    footer { text-align: center; padding: 2rem; color: var(--text3); font-size: 12px; border-top: 1px solid var(--border); margin-top: 2rem; }
+    footer a { color: var(--green); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <a class="logo" href="/">계산기<span>모음</span></a>
+  </div>
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-item" href="/">💰 배당금 계산기</a>
+      <a class="nav-item" href="/salary.html">💵 연봉 실수령액</a>
+      <a class="nav-item" href="/loan.html">🏦 대출이자 계산기</a>
+      <a class="nav-item" href="/retire.html">🏖️ 퇴직금 계산기</a>
+      <a class="nav-item" href="/tax.html">📝 연말정산 계산기</a>
+      <a class="nav-item" href="/parttime.html">💼 알바수당 계산기</a>
+      <a class="nav-item active" href="/pension.html">🏛️ 국민연금 계산기</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>국민연금 예상 수령액 계산기</h1>
+    <p>지금까지 납부한 기간·금액 기준으로<br>추가 납부 없이 65세부터 받을 금액을 계산해요</p>
+  </div>
+
+  <div class="guide-box">
+    <p>📮 <strong>더 정확한 금액</strong>은 국민연금공단 앱 <strong>'내 곁에 국민연금'</strong> 또는 <strong>국민연금공단 홈페이지(nps.or.kr)</strong>에서 로그인 후 조회하세요. 아래 계산기는 참고용이에요.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="step-badge">1</span> 납부 현황 입력</div>
+    <div class="grid2">
+      <div class="field">
+        <label>현재 나이 <span>만 나이</span></label>
+        <input type="number" id="currentAge" value="35" min="18" max="64" oninput="onAgeChange()" />
+        <div class="input-hint" id="age-hint">65세까지 30년 남음</div>
+      </div>
+      <div class="field">
+        <label>지금까지 납부 기간 <span>개월 수</span></label>
+        <input type="number" id="paidMonths" value="120" min="1" oninput="checkMonths()" />
+        <div class="input-hint">예) 10년 = 120개월</div>
+        <div class="warn-hint" id="month-warn">⚠️ 최소 120개월(10년) 이상 납부해야 연금을 받을 수 있어요</div>
+      </div>
+      <div class="field">
+        <label>지금까지 총 납부액 <span>원</span></label>
+        <input type="number" id="totalPaid" value="24000000" step="100000" />
+        <div class="input-hint">국민연금 통지서 또는 앱에서 확인</div>
+      </div>
+      <div class="field">
+        <label>현재 월 평균 소득 <span>기준소득월액</span></label>
+        <input type="number" id="avgIncome" value="3000000" step="100000" />
+        <div class="input-hint">납부액 ÷ 0.09 또는 월 세전 급여</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="min-warn-box" class="warn-box">
+    ⚠️ 국민연금은 최소 10년(120개월) 이상 납부해야 연금으로 받을 수 있어요. 10년 미만이면 만 60세에 반환일시금으로 돌려받습니다.
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">예상 수령액 계산하기</button>
+
+  <!-- 결과 -->
+  <div id="result-area" class="hidden" style="margin-top:1.5rem;">
+
+    <div class="result-hero" id="result-hero">
+      <div class="result-hero-label" id="result-label">65세부터 받을 월 예상 수령액</div>
+      <div class="result-hero-value" id="result-value">0원</div>
+      <div class="result-hero-sub" id="result-sub"></div>
+    </div>
+
+    <div class="metrics" id="metrics"></div>
+
+    <div class="card">
+      <div class="section-label" style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;">기간별 누적 수령액</div>
+      <div id="cumulative-bars"></div>
+      <div class="amber-box" id="breakeven-box"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label" style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;">납부액 vs 수령액 비교</div>
+      <div id="bars"></div>
+      <div class="info-box" id="info-box"></div>
+    </div>
+
+  </div>
+
+  <!-- 설명글 -->
+  <div class="guide">
+    <h2>국민연금 최소 납부 조건</h2>
+
+    <h3>📌 최소 납부 기간</h3>
+    <p>국민연금은 <strong>최소 10년(120개월)</strong> 이상 납부해야 노령연금으로 수령할 수 있습니다. 10년 미만이면 연금이 아닌 <strong>반환일시금</strong>으로 돌려받습니다.</p>
+
+    <table class="min-table">
+      <thead>
+        <tr><th>납부 기간</th><th>수령 방식</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>10년(120개월) 미만</td><td>반환일시금</td><td>만 60세에 원금+이자 일시 지급</td></tr>
+        <tr><td>10년(120개월) 이상</td><td>노령연금 (월 수령)</td><td>만 65세부터 매월 지급</td></tr>
+        <tr><td>20년 이상</td><td>완전노령연금</td><td>감액 없이 전액 수령</td></tr>
+      </tbody>
+    </table>
+
+    <h3>📌 최소 납부 금액</h3>
+    <p>2026년 기준 월 최소 납부액은 기준소득월액 하한선(월 39만원)의 9%인 <strong>월 35,100원</strong>입니다. 최대 납부액은 기준소득월액 상한선(월 590만원)의 9%인 <strong>월 531,000원</strong>입니다.</p>
+
+    <table class="min-table">
+      <thead>
+        <tr><th>구분</th><th>기준소득월액</th><th>월 납부액 (9%)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>최솟값</td><td>390,000원</td><td>35,100원</td></tr>
+        <tr><td>최댓값</td><td>5,900,000원</td><td>531,000원</td></tr>
+      </tbody>
+    </table>
+
+    <h3>📌 수령 시작 나이</h3>
+    <p>1969년 이후 출생자는 <strong>만 65세</strong>부터 수령 가능합니다. 원하면 최대 5년 일찍 조기 수령할 수 있지만, 1년마다 6%씩 감액됩니다.</p>
+
+    <table class="min-table">
+      <thead>
+        <tr><th>수령 시작 나이</th><th>수령액 비율</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>60세 (5년 조기)</td><td>70%</td></tr>
+        <tr><td>61세 (4년 조기)</td><td>76%</td></tr>
+        <tr><td>62세 (3년 조기)</td><td>82%</td></tr>
+        <tr><td>63세 (2년 조기)</td><td>88%</td></tr>
+        <tr><td>64세 (1년 조기)</td><td>94%</td></tr>
+        <tr><td>65세 (정상)</td><td>100%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="guide-box2">
+      <p>💡 반대로 65세 이후 연기해서 받으면 1년마다 7.2%씩 최대 36% 더 받을 수 있어요. 건강하다면 연기 수령도 좋은 전략이에요!</p>
+    </div>
+
+    <h2 style="margin-top:2rem;">자주 묻는 질문 (FAQ)</h2>
+    <div class="faq-item">
+      <div class="faq-q">Q. 10년 미만 납부했는데 어떻게 되나요?</div>
+      <div class="faq-a">만 60세가 되면 그동안 납부한 보험료에 이자를 더해 반환일시금으로 돌려받습니다. 단, 추후납부(추납) 제도를 활용해 납부 예외 기간을 소급 납부하면 10년을 채워 연금으로 받을 수 있습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 직장을 그만두면 납부는 어떻게 되나요?</div>
+      <div class="faq-a">퇴직 후 소득이 없으면 납부 예외 신청을 할 수 있습니다. 이 기간은 가입 기간에 포함되지 않지만 나중에 추후납부(추납)로 채울 수 있습니다. 또는 지역가입자로 전환해 계속 납부할 수도 있습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 국민연금 예상 수령액은 어디서 정확히 확인하나요?</div>
+      <div class="faq-a">국민연금공단 앱 '내 곁에 국민연금'에서 로그인 후 바로 확인할 수 있습니다. 또는 국민연금공단 홈페이지(nps.or.kr) → 전자민원 → 예상연금 조회에서 확인할 수 있어요. 매년 우편으로 발송되는 예상연금 통지서에도 기재되어 있습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 국민연금도 세금을 내나요?</div>
+      <div class="faq-a">2002년 1월 이후 납부한 보험료에 대한 연금 수령액은 연금소득세 과세 대상입니다. 하지만 연금소득 공제가 적용되고 세율도 낮아 실제 부담은 크지 않습니다. 연금 외 다른 소득이 없다면 세 부담은 거의 없는 수준이에요.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  본 계산기는 참고용이며 실제 수령액은 국민연금공단 공식 조회를 통해 확인하세요.<br>
+  <a href="/privacy.html">개인정보처리방침</a> · <a href="/">홈으로</a>
+</footer>
+
+<script>
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR') + '원'; }
+
+function onAgeChange() {
+  const age = parseInt(document.getElementById('currentAge').value) || 0;
+  const left = 65 - age;
+  const hint = document.getElementById('age-hint');
+  if (left <= 0) { hint.textContent = '이미 65세 이상입니다'; hint.style.color = 'var(--red)'; }
+  else { hint.textContent = `65세까지 ${left}년 남음`; hint.style.color = 'var(--text3)'; }
+}
+
+function checkMonths() {
+  const m = parseInt(document.getElementById('paidMonths').value) || 0;
+  document.getElementById('month-warn').style.display = (m > 0 && m < 120) ? 'block' : 'none';
+  document.getElementById('min-warn-box').style.display = (m > 0 && m < 120) ? 'block' : 'none';
+}
+
+function calculate() {
+  const currentAge  = parseInt(document.getElementById('currentAge').value) || 0;
+  const paidMonths  = parseInt(document.getElementById('paidMonths').value) || 0;
+  const totalPaid   = parseFloat(document.getElementById('totalPaid').value) || 0;
+  const avgIncome   = parseFloat(document.getElementById('avgIncome').value) || 0;
+
+  if (currentAge >= 65) { alert('65세 미만 나이를 입력해주세요.'); return; }
+  if (paidMonths < 1)   { alert('납부 기간을 입력해주세요.'); return; }
+
+  const yearsLeft    = 65 - currentAge;
+  const paidYears    = paidMonths / 12;
+  const isEligible   = paidMonths >= 120; // 10년 이상
+
+  // 국민연금 수령액 계산 (현재 납부 기준만)
+  // 기본연금액 = 1.2 × (A + B) × (1 + 0.05 × n/12)
+  // 단순화: 평균소득 × 납부기간(년) × 약 1.5% (국민연금 산식 근사)
+  const A = avgIncome; // 전체 가입자 평균소득 근사
+  const B = avgIncome; // 본인 평균 소득월액
+  let monthlyPension = 0;
+
+  if (isEligible) {
+    // 기본연금액 = 1.2 × (A+B)/2 × (0.5 + 가입월수/12 × 0.5/20)
+    // 국민연금 공식 단순화 버전
+    monthlyPension = avgIncome * paidYears * 0.013 + 100000 * (paidYears / 40);
+    monthlyPension = Math.max(monthlyPension, avgIncome * 0.04); // 최소 보정
+  }
+
+  // 연간·생애 수령
+  const annualPension    = monthlyPension * 12;
+  const lifetime20       = monthlyPension * 12 * 20;
+  const lifetime85       = monthlyPension * 12 * 20; // 85세 기준 20년
+  const breakEvenMonths  = monthlyPension > 0 ? totalPaid / monthlyPension : 0;
+  const breakEvenYears   = breakEvenMonths / 12;
+  const breakEvenAge     = Math.ceil(65 + breakEvenYears);
+
+  // 결과 UI
+  const hero = document.getElementById('result-hero');
+  hero.className = 'result-hero' + (isEligible ? '' : ' warn');
+  document.getElementById('result-label').textContent = isEligible
+    ? '65세부터 받을 월 예상 수령액 (현재 납부 기준)'
+    : '⚠️ 연금 수령 불가 (10년 미만)';
+  document.getElementById('result-value').textContent = isEligible ? fmt(monthlyPension) : '반환일시금';
+  document.getElementById('result-sub').textContent = isEligible
+    ? `납부 기간 ${Math.floor(paidYears)}년 ${paidMonths % 12}개월 기준 · 추가 납부 없을 경우\n65세까지 ${yearsLeft}년 남음`
+    : `납부 기간 ${Math.floor(paidYears)}년 ${paidMonths % 12}개월 — 최소 10년(120개월) 이상 납부 필요\n만 60세에 ${fmt(totalPaid)} 내외 반환일시금 수령`;
+
+  document.getElementById('metrics').innerHTML = [
+    { label:'월 예상 수령액',   value: isEligible ? fmt(monthlyPension) : '-',         cls: isEligible ? 'green' : 'red' },
+    { label:'연간 수령액',      value: isEligible ? fmt(annualPension) : '-',           cls:'blue'   },
+    { label:'지금까지 납부액',  value: fmt(totalPaid),                                   cls:'amber'  },
+    { label:'손익분기점',       value: isEligible ? `${breakEvenAge}세` : '-',           cls:'purple' },
+  ].map(m => `<div class="metric ${m.cls}"><div class="metric-label">${m.label}</div><div class="metric-value">${m.value}</div></div>`).join('');
+
+  if (isEligible) {
+    // 누적 수령 바
+    const years = [5, 10, 15, 20, 25, 30];
+    const maxCum = monthlyPension * 12 * 30;
+    document.getElementById('cumulative-bars').innerHTML = years.map(y => {
+      const cum = monthlyPension * 12 * y;
+      const isPast = (65 + y) > breakEvenAge;
+      return `
+        <div class="bar-row">
+          <span class="bar-label" style="width:120px;${isPast ? 'color:var(--green);font-weight:600;' : ''}">${65+y}세 (${y}년)</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(cum/maxCum)*100).toFixed(1)}%;background:${isPast ? '#0d9488' : '#94a3b8'};"></div></div>
+          <span class="bar-val" style="${isPast ? 'color:var(--green);' : ''}">${fmt(cum)}</span>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('breakeven-box').textContent =
+      `💡 ${breakEvenAge}세(수령 ${Math.ceil(breakEvenYears)}년 후)부터 납부한 ${fmt(totalPaid)}를 모두 회수해요. 이후부터는 순수 이익!`;
+
+    // 납부 vs 수령 바
+    const barMax = Math.max(totalPaid, lifetime20);
+    document.getElementById('bars').innerHTML = [
+      { label:'총 납부액',     val: totalPaid,   color:'#dc2626' },
+      { label:'20년 수령액',   val: lifetime20,  color:'#0d9488' },
+    ].map(item => `
+      <div class="bar-row">
+        <span class="bar-label">${item.label}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(item.val/barMax)*100).toFixed(1)}%;background:${item.color};"></div></div>
+        <span class="bar-val">${fmt(item.val)}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('info-box').textContent =
+      `20년(85세) 기준 총 ${fmt(lifetime20)} 수령 예상 · 납부액 대비 ${(lifetime20/totalPaid).toFixed(1)}배 수령!`;
+  } else {
+    document.getElementById('cumulative-bars').innerHTML =
+      `<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:14px;">10년 이상 납부 시 계산 가능해요</div>`;
+    document.getElementById('breakeven-box').style.display = 'none';
+    document.getElementById('bars').innerHTML = '';
+    document.getElementById('info-box').textContent =
+      `현재까지 납부액 ${fmt(totalPaid)}는 만 60세에 이자와 함께 반환일시금으로 돌려받아요.`;
+  }
+
+  document.getElementById('result-area').classList.remove('hidden');
+  document.getElementById('result-area').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+onAgeChange();
+</script>
+</body>
+</html>
