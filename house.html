@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주택 구매 비용 계산기 — 취득세 대출 총비용 계산</title>
+  <meta name="description" content="집값을 입력하면 취득세, 법무사, 중개보수, 인지세 등 모든 부대비용과 대출 가능 금액, 월 상환금까지 한 번에 계산합니다." />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f7fa; --surface: #ffffff; --surface2: #f0f3f8; --border: #e2e8f0;
+      --text: #1a202c; --text2: #64748b; --text3: #94a3b8;
+      --green: #0d9488; --green-light: #f0fdfa;
+      --blue: #2563eb; --blue-light: #eff6ff;
+      --red: #dc2626; --red-light: #fef2f2;
+      --amber: #d97706; --amber-light: #fffbeb;
+      --purple: #7c3aed; --purple-light: #f5f3ff;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .header-top { max-width: 980px; margin: 0 auto; padding: 1rem 1.5rem; }
+    .logo { font-size: 20px; font-weight: 600; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--green); }
+    nav { border-top: 1px solid var(--border); }
+    .nav-inner { max-width: 980px; margin: 0 auto; padding: 0 1.5rem; display: flex; overflow-x: auto; scrollbar-width: none; }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-item { display: flex; align-items: center; gap: 6px; padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--text2); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .nav-item:hover { color: var(--text); background: var(--surface2); }
+    .nav-item.active { color: var(--green); border-bottom-color: var(--green); }
+    .nav-badge { font-size: 10px; background: var(--surface2); color: var(--text3); padding: 1px 6px; border-radius: 10px; }
+    main { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .hero { text-align: center; margin-bottom: 2rem; }
+    .hero h1 { font-size: 28px; font-weight: 600; margin-bottom: 0.5rem; }
+    .hero p { color: var(--text2); }
+    .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--green); color: white; border-radius: 50%; font-size: 13px; font-weight: 600; margin-right: 8px; flex-shrink: 0; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+    .card-title { display: flex; align-items: center; font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; }
+    .section-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { font-size: 13px; color: var(--text2); font-weight: 500; display: flex; justify-content: space-between; }
+    .field label span { color: var(--text3); font-weight: 400; font-size: 11px; }
+    input[type="number"], select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
+    input:focus, select:focus { border-color: var(--green); }
+    .input-hint { font-size: 12px; color: var(--text3); margin-top: 3px; }
+    .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .quick-btn { padding: 5px 12px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--surface); font-family: inherit; font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+    .quick-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+    .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toggle-btn { flex: 1; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; text-align: center; min-width: 80px; }
+    .toggle-btn.active { border-color: var(--green); background: var(--green-light); color: var(--green); }
+    .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+    .calc-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s; }
+    .calc-btn:hover { opacity: 0.9; }
+
+    /* 결과 */
+    .result-summary { background: linear-gradient(135deg, #0d9488, #0891b2); border-radius: var(--radius); padding: 2rem; margin-bottom: 1rem; color: white; }
+    .result-summary-title { font-size: 14px; opacity: 0.85; margin-bottom: 1rem; text-align: center; }
+    .result-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result-summary-item { background: rgba(255,255,255,0.15); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
+    .result-summary-label { font-size: 12px; opacity: 0.85; margin-bottom: 4px; }
+    .result-summary-value { font-size: 20px; font-weight: 700; }
+
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 1rem; }
+    .metric { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
+    .metric.green  { background: var(--green-light);  border-color: #99f6e4; }
+    .metric.blue   { background: var(--blue-light);   border-color: #bfdbfe; }
+    .metric.red    { background: var(--red-light);    border-color: #fecaca; }
+    .metric.amber  { background: var(--amber-light);  border-color: #fde68a; }
+    .metric.purple { background: var(--purple-light); border-color: #ddd6fe; }
+    .metric-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; font-weight: 500; }
+    .metric-value { font-size: 20px; font-weight: 600; }
+    .metric.green  .metric-value { color: var(--green); }
+    .metric.blue   .metric-value { color: var(--blue); }
+    .metric.red    .metric-value { color: var(--red); }
+    .metric.amber  .metric-value { color: var(--amber); }
+    .metric.purple .metric-value { color: var(--purple); }
+
+    .cost-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .cost-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--text3); border-bottom: 1px solid var(--border); }
+    .cost-table th:last-child { text-align: right; }
+    .cost-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+    .cost-table td:last-child { text-align: right; font-weight: 600; color: var(--text); }
+    .cost-table .sub-row td { padding: 7px 12px; background: var(--surface2); font-size: 13px; }
+    .cost-table .total-row td { font-weight: 700; font-size: 15px; background: var(--green-light); border-bottom: none; color: var(--text); }
+    .cost-table .total-row td:last-child { color: var(--green); font-size: 16px; }
+
+    .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .bar-label { font-size: 13px; color: var(--text2); width: 90px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 10px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 5px; transition: width 0.4s ease; }
+    .bar-val { font-size: 13px; font-weight: 600; min-width: 90px; text-align: right; }
+
+    .info-box { background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: #1e40af; margin-top: 1rem; line-height: 1.7; }
+    .warn-box { background: var(--amber-light); border-left: 3px solid var(--amber); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 1rem; font-size: 13px; color: #92400e; line-height: 1.7; }
+
+    .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-top: 2rem; }
+    .guide h2 { font-size: 20px; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+    .guide h3 { font-size: 16px; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--green); }
+    .guide p { color: var(--text2); font-size: 14px; line-height: 1.8; margin-bottom: 0.75rem; }
+    .guide ul { color: var(--text2); font-size: 14px; line-height: 1.8; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .guide li { margin-bottom: 0.4rem; }
+    .guide-box { background: var(--green-light); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+    .guide-box p { color: var(--text); margin: 0; font-size: 14px; line-height: 1.7; }
+    .tax-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 0.75rem 0; }
+    .tax-table th { background: var(--surface2); padding: 8px 12px; text-align: left; font-weight: 600; font-size: 13px; color: var(--text2); border-bottom: 1px solid var(--border); }
+    .tax-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+    .tax-table tr:last-child td { border-bottom: none; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 600; font-size: 14px; margin-bottom: 0.5rem; }
+    .faq-a { font-size: 14px; color: var(--text2); line-height: 1.8; }
+    .hidden { display: none; }
+    footer { text-align: center; padding: 2rem; color: var(--text3); font-size: 12px; border-top: 1px solid var(--border); margin-top: 2rem; }
+    footer a { color: var(--green); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <a class="logo" href="/">계산기<span>모음</span></a>
+  </div>
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-item" href="/">💰 배당금</a>
+      <a class="nav-item" href="/salary.html">💵 연봉</a>
+      <a class="nav-item" href="/loan.html">🏦 대출이자</a>
+      <a class="nav-item" href="/retire.html">🏖️ 퇴직금</a>
+      <a class="nav-item" href="/tax.html">📝 연말정산</a>
+      <a class="nav-item" href="/parttime.html">💼 알바수당</a>
+      <a class="nav-item" href="/pension.html">🏛️ 국민연금</a>
+      <a class="nav-item active" href="/house.html">🏠 주택구매비용</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>주택 구매 비용 계산기</h1>
+    <p>취득세·부대비용·대출까지 집 살 때 실제로 필요한 총 금액을 계산하세요</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="card-title"><span class="step-badge">1</span> 주택 기본 정보</div>
+    <div class="field">
+      <label>매매 가격 <span>실거래가</span></label>
+      <input type="number" id="price" value="500000000" step="10000000" />
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="setPrice(200000000)">2억</button>
+        <button class="quick-btn" onclick="setPrice(300000000)">3억</button>
+        <button class="quick-btn" onclick="setPrice(500000000)">5억</button>
+        <button class="quick-btn" onclick="setPrice(700000000)">7억</button>
+        <button class="quick-btn" onclick="setPrice(1000000000)">10억</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>주택 보유 수 <span>취득 후 기준</span></label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="house-1" onclick="setHouseCount(1)">1주택</button>
+          <button class="toggle-btn" id="house-2" onclick="setHouseCount(2)">2주택</button>
+          <button class="toggle-btn" id="house-3" onclick="setHouseCount(3)">3주택+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>주택 유형</label>
+        <select id="houseType">
+          <option value="apt">아파트</option>
+          <option value="villa">빌라·다세대</option>
+          <option value="single">단독주택</option>
+          <option value="officetel">오피스텔</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>취득 방법</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="buy-buy" onclick="setBuyType('buy')">일반 매매</button>
+        <button class="toggle-btn" id="buy-new" onclick="setBuyType('new')">분양 (신규)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="card-title"><span class="step-badge">2</span> 대출 정보</div>
+    <div class="grid2">
+      <div class="field">
+        <label>연 소득 <span>세전 연봉</span></label>
+        <input type="number" id="income" value="50000000" step="1000000" />
+        <div class="input-hint">DSR 계산에 사용됩니다</div>
+      </div>
+      <div class="field">
+        <label>희망 대출 금액</label>
+        <input type="number" id="loanAmount" value="300000000" step="10000000" />
+        <div class="input-hint">0 입력 시 LTV 기준 자동 계산</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>대출 금리 (%)</label>
+        <input type="number" id="loanRate" value="4.5" step="0.1" />
+      </div>
+      <div class="field">
+        <label>대출 기간</label>
+        <select id="loanPeriod">
+          <option value="10">10년</option>
+          <option value="15">15년</option>
+          <option value="20">20년</option>
+          <option value="30" selected>30년</option>
+          <option value="40">40년</option>
+          <option value="50">50년</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">구매 비용 계산하기</button>
+
+  <!-- 결과 -->
+  <div id="result-area" class="hidden" style="margin-top:1.5rem;">
+
+    <div class="result-summary">
+      <div class="result-summary-title">💰 주택 구매 총 비용 요약</div>
+      <div class="result-summary-grid">
+        <div class="result-summary-item">
+          <div class="result-summary-label">실제 필요 현금</div>
+          <div class="result-summary-value" id="sum-cash">0원</div>
+        </div>
+        <div class="result-summary-item">
+          <div class="result-summary-label">총 취득 비용</div>
+          <div class="result-summary-value" id="sum-total">0원</div>
+        </div>
+        <div class="result-summary-item">
+          <div class="result-summary-label">대출 금액</div>
+          <div class="result-summary-value" id="sum-loan">0원</div>
+        </div>
+        <div class="result-summary-item">
+          <div class="result-summary-label">월 상환금</div>
+          <div class="result-summary-value" id="sum-monthly">0원</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics" id="metrics"></div>
+
+    <!-- 취득 비용 상세 -->
+    <div class="card">
+      <div class="section-label">취득 비용 상세</div>
+      <table class="cost-table">
+        <thead><tr><th>항목</th><th>계산 기준</th><th>금액</th></tr></thead>
+        <tbody id="cost-body"></tbody>
+      </table>
+    </div>
+
+    <!-- 대출 분석 -->
+    <div class="card">
+      <div class="section-label">대출 분석</div>
+      <div id="loan-detail"></div>
+      <div class="info-box" id="loan-info"></div>
+    </div>
+
+    <!-- 비용 구성 -->
+    <div class="card">
+      <div class="section-label">비용 구성</div>
+      <div id="bars"></div>
+    </div>
+
+    <div id="warn-dsr" class="warn-box hidden">
+      ⚠️ 희망 대출금액이 DSR 40% 기준을 초과할 수 있어요. 실제 대출 가능 여부는 금융기관에 확인하세요.
+    </div>
+
+  </div>
+
+  <!-- 설명글 -->
+  <div class="guide">
+    <h2>주택 구매 시 필요한 비용 총정리</h2>
+    <p>집을 살 때는 매매가격 외에도 다양한 부대비용이 발생합니다. 사전에 정확한 비용을 파악해야 자금 계획을 세울 수 있습니다.</p>
+
+    <h3>📌 취득세</h3>
+    <p>주택을 취득할 때 내는 세금으로 주택 가격과 보유 주택 수에 따라 세율이 달라집니다.</p>
+    <table class="tax-table">
+      <thead><tr><th>구분</th><th>주택 가격</th><th>취득세율</th></tr></thead>
+      <tbody>
+        <tr><td>1주택</td><td>6억원 이하</td><td>1%</td></tr>
+        <tr><td>1주택</td><td>6억~9억원</td><td>1~3% (비례)</td></tr>
+        <tr><td>1주택</td><td>9억원 초과</td><td>3%</td></tr>
+        <tr><td>2주택</td><td>전체</td><td>8%</td></tr>
+        <tr><td>3주택 이상</td><td>전체</td><td>12%</td></tr>
+      </tbody>
+    </table>
+
+    <h3>📌 LTV란?</h3>
+    <p>LTV(주택담보대출비율)는 주택 가격 대비 대출 가능 금액의 비율입니다. 투기과열지구는 LTV 40~50%, 일반 지역은 LTV 60~70%가 적용됩니다.</p>
+
+    <h3>📌 DSR이란?</h3>
+    <p>DSR(총부채원리금상환비율)은 연 소득 대비 모든 대출의 연간 원리금 상환액 비율입니다. 은행권 기준 DSR 40%를 초과하면 대출이 제한됩니다.</p>
+
+    <div class="guide-box">
+      <p>💡 집값의 약 4~6% 정도를 부대비용으로 준비하세요. 5억 집이라면 약 2,000~3,000만원의 추가 비용이 필요해요!</p>
+    </div>
+
+    <h2 style="margin-top:2rem;">자주 묻는 질문 (FAQ)</h2>
+    <div class="faq-item">
+      <div class="faq-q">Q. 취득세는 언제 내나요?</div>
+      <div class="faq-a">잔금 지급일로부터 60일 이내에 납부해야 합니다. 기한 내 미납 시 가산세가 부과됩니다. 법무사를 통해 등기 시 함께 처리하는 경우가 많습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 법무사 비용은 얼마나 드나요?</div>
+      <div class="faq-a">법무사 수수료는 주택 가격과 대출 유무에 따라 다르지만 보통 40~100만원 수준입니다. 대출 등기가 포함되면 추가 비용이 발생합니다. 법무사마다 비용이 다르므로 사전에 견적을 받아보세요.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 부동산 중개보수는 얼마인가요?</div>
+      <div class="faq-a">매매가격에 따라 요율이 다릅니다. 5억원 이하는 0.4% 이내, 5억~9억원은 0.5% 이내, 9억원 초과는 0.9% 이내입니다. 중개보수는 협의가 가능합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q. 생애최초 주택 구매 시 혜택이 있나요?</div>
+      <div class="faq-a">생애최초 주택 구매자는 취득세 감면 혜택을 받을 수 있습니다. 수도권 4억원 이하, 비수도권 3억원 이하 주택 구매 시 취득세 200만원 한도 내에서 감면됩니다. 또한 LTV 우대 적용으로 더 많은 대출이 가능합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  본 계산기는 참고용이며 실제 비용은 개인 상황에 따라 다를 수 있습니다.<br>
+  취득세율은 2026년 기준이며 정책 변경 시 달라질 수 있습니다.<br>
+  <a href="/privacy.html">개인정보처리방침</a> · <a href="/">홈으로</a>
+</footer>
+
+<script>
+let houseCount = 1;
+let buyType = 'buy';
+
+function setPrice(v) { document.getElementById('price').value = v; }
+function setHouseCount(n) {
+  houseCount = n;
+  [1,2,3].forEach(i => document.getElementById('house-'+i).classList.toggle('active', i===n));
+}
+function setBuyType(t) {
+  buyType = t;
+  ['buy','new'].forEach(k => document.getElementById('buy-'+k).classList.toggle('active', k===t));
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR') + '원'; }
+function fmtPct(n) { return parseFloat(n).toFixed(2) + '%'; }
+
+// 취득세 계산
+function calcAcquisitionTax(price, count) {
+  if (count >= 3) return price * 0.12;
+  if (count === 2) return price * 0.08;
+  // 1주택
+  if (price <= 600000000) return price * 0.01;
+  if (price <= 900000000) {
+    const rate = 0.01 + (price - 600000000) / 300000000 * 0.02;
+    return price * rate;
+  }
+  return price * 0.03;
+}
+
+// 지방교육세 (취득세의 10%)
+// 농어촌특별세 (취득세의 20%, 85㎡ 초과)
+
+function calculate() {
+  const price      = parseFloat(document.getElementById('price').value) || 0;
+  const income     = parseFloat(document.getElementById('income').value) || 0;
+  const loanInput  = parseFloat(document.getElementById('loanAmount').value) || 0;
+  const loanRate   = parseFloat(document.getElementById('loanRate').value) || 0;
+  const loanPeriod = parseInt(document.getElementById('loanPeriod').value);
+  const houseType  = document.getElementById('houseType').value;
+
+  // ① 취득세
+  const acqTax     = calcAcquisitionTax(price, houseCount);
+  const localEduTax= acqTax * 0.1;    // 지방교육세
+  const ruralTax   = acqTax * 0.2;    // 농어촌특별세 (단순화)
+  const totalTax   = acqTax + localEduTax + (houseCount === 1 ? ruralTax : 0);
+
+  // ② 법무사 수수료 (간이 계산)
+  let legalFee = 0;
+  if (price <= 100000000)       legalFee = 200000;
+  else if (price <= 300000000)  legalFee = 400000;
+  else if (price <= 500000000)  legalFee = 600000;
+  else if (price <= 1000000000) legalFee = 900000;
+  else                          legalFee = 1200000;
+
+  // ③ 중개보수
+  let agentRate = 0;
+  if (price <= 500000000)       agentRate = 0.004;
+  else if (price <= 900000000)  agentRate = 0.005;
+  else                          agentRate = 0.009;
+  const agentFee = Math.min(price * agentRate, price * 0.009);
+
+  // ④ 인지세
+  let stampTax = 0;
+  if (price <= 10000000)        stampTax = 0;
+  else if (price <= 30000000)   stampTax = 20000;
+  else if (price <= 50000000)   stampTax = 40000;
+  else if (price <= 100000000)  stampTax = 70000;
+  else if (price <= 300000000)  stampTax = 150000;
+  else if (price <= 500000000)  stampTax = 350000;
+  else                          stampTax = 350000;
+
+  // ⑤ 국민주택채권
+  const bondRate = price <= 500000000 ? 0.008 : 0.013;
+  const bondCost = price * bondRate * 0.3; // 즉시 매도 시 손실분 약 30%
+
+  // ⑥ 이사 비용 (단순 추정)
+  const movingCost = 500000;
+
+  // 총 부대비용
+  const totalExtra = totalTax + legalFee + agentFee + stampTax + bondCost + movingCost;
+  const totalCost  = price + totalExtra;
+
+  // 대출 계산
+  const ltvRate  = houseCount === 1 ? 0.7 : 0.6;
+  const maxLtv   = price * ltvRate;
+  const actualLoan = loanInput > 0 ? Math.min(loanInput, maxLtv) : maxLtv;
+
+  // DSR 계산
+  const r = loanRate / 100 / 12;
+  const n = loanPeriod * 12;
+  const monthlyPayment = r > 0 ? actualLoan * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1) : actualLoan/n;
+  const annualPayment  = monthlyPayment * 12;
+  const dsr            = income > 0 ? (annualPayment / income) * 100 : 0;
+
+  // 실제 필요 현금
+  const cashNeeded = totalCost - actualLoan;
+
+  // 결과 UI
+  document.getElementById('sum-cash').textContent    = fmt(cashNeeded);
+  document.getElementById('sum-total').textContent   = fmt(totalCost);
+  document.getElementById('sum-loan').textContent    = fmt(actualLoan);
+  document.getElementById('sum-monthly').textContent = fmt(monthlyPayment);
+
+  document.getElementById('metrics').innerHTML = [
+    { label:'취득세 합계',   value: fmt(totalTax),    cls:'red'    },
+    { label:'총 부대비용',   value: fmt(totalExtra),  cls:'amber'  },
+    { label:'LTV 최대 대출', value: fmt(maxLtv),      cls:'blue'   },
+    { label:'DSR 비율',      value: fmtPct(dsr),      cls: dsr <= 40 ? 'green' : 'red' },
+  ].map(m => `<div class="metric ${m.cls}"><div class="metric-label">${m.label}</div><div class="metric-value">${m.value}</div></div>`).join('');
+
+  // 비용 상세 테이블
+  const taxRate = houseCount >= 3 ? '12%' : houseCount === 2 ? '8%' : price <= 600000000 ? '1%' : price <= 900000000 ? '1~3%' : '3%';
+  document.getElementById('cost-body').innerHTML = `
+    <tr><td><strong>매매가격</strong></td><td></td><td><strong>${fmt(price)}</strong></td></tr>
+    <tr><td>취득세</td><td style="color:var(--text3);font-size:13px;">${taxRate} 적용</td><td>${fmt(acqTax)}</td></tr>
+    <tr class="sub-row"><td style="padding-left:24px;">└ 지방교육세</td><td style="color:var(--text3);font-size:13px;">취득세×10%</td><td>${fmt(localEduTax)}</td></tr>
+    ${houseCount === 1 ? `<tr class="sub-row"><td style="padding-left:24px;">└ 농어촌특별세</td><td style="color:var(--text3);font-size:13px;">취득세×20%</td><td>${fmt(ruralTax)}</td></tr>` : ''}
+    <tr><td>법무사 수수료</td><td style="color:var(--text3);font-size:13px;">등기 비용</td><td>${fmt(legalFee)}</td></tr>
+    <tr><td>부동산 중개보수</td><td style="color:var(--text3);font-size:13px;">${(agentRate*100).toFixed(1)}% 이내</td><td>${fmt(agentFee)}</td></tr>
+    <tr><td>인지세</td><td style="color:var(--text3);font-size:13px;">계약서 작성</td><td>${fmt(stampTax)}</td></tr>
+    <tr><td>국민주택채권 손실</td><td style="color:var(--text3);font-size:13px;">즉시 매도 기준</td><td>${fmt(bondCost)}</td></tr>
+    <tr><td>이사 비용 (추정)</td><td style="color:var(--text3);font-size:13px;">거리에 따라 다름</td><td>${fmt(movingCost)}</td></tr>
+    <tr class="total-row"><td>총 취득 비용</td><td></td><td>${fmt(totalCost)}</td></tr>
+  `;
+
+  // 대출 상세
+  document.getElementById('loan-detail').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+      <div style="background:var(--blue-light);border-radius:var(--radius-sm);padding:1rem;text-align:center;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">LTV 기준 최대 대출</div>
+        <div style="font-size:18px;font-weight:700;color:var(--blue);">${fmt(maxLtv)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">LTV ${(ltvRate*100).toFixed(0)}% 적용</div>
+      </div>
+      <div style="background:var(--green-light);border-radius:var(--radius-sm);padding:1rem;text-align:center;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">월 상환금 (원리금균등)</div>
+        <div style="font-size:18px;font-weight:700;color:var(--green);">${fmt(monthlyPayment)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">금리 ${loanRate}% · ${loanPeriod}년</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);">
+      DSR <strong style="color:${dsr<=40?'var(--green)':'var(--red)'};">${fmtPct(dsr)}</strong>
+      (기준 40% · ${dsr<=40?'✅ 적정':'⚠️ 초과 가능성'})
+      · 연간 상환액 ${fmt(annualPayment)}
+    </div>
+  `;
+
+  // 바 차트
+  const barMax = totalCost;
+  document.getElementById('bars').innerHTML = [
+    { label:'매매가격',   val: price,       color:'#2563eb' },
+    { label:'취득세',     val: totalTax,    color:'#dc2626' },
+    { label:'중개보수',   val: agentFee,    color:'#d97706' },
+    { label:'법무사',     val: legalFee,    color:'#7c3aed' },
+    { label:'기타비용',   val: stampTax+bondCost+movingCost, color:'#94a3b8' },
+  ].map(item => `
+    <div class="bar-row">
+      <span class="bar-label">${item.label}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(item.val/barMax)*100).toFixed(1)}%;background:${item.color};"></div></div>
+      <span class="bar-val">${fmt(item.val)}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('loan-info').textContent =
+    `💡 실제 필요 현금 ${fmt(cashNeeded)} = 총 취득비용 ${fmt(totalCost)} - 대출 ${fmt(actualLoan)}`;
+
+  document.getElementById('warn-dsr').classList.toggle('hidden', dsr <= 40);
+  document.getElementById('result-area').classList.remove('hidden');
+  document.getElementById('result-area').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
